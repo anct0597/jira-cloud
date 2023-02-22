@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  # MySQL
+  postgresql:
+    image: postgres:9.5-alpine
+    networks:
+      - jiranet
+    restart: always
+    volumes:
+      - /media/HDD/jira/postgresqldata:/var/lib/postgresql/data
+    environment:
+      - 'POSTGRES_USER=jira'
+      # CHANGE THE PASSWORD!
+      - 'POSTGRES_PASSWORD=jellyfish'
+      - 'POSTGRES_DB=jiradb'
+      - 'POSTGRES_ENCODING=UNICODE'
+      - 'POSTGRES_COLLATE=C'
+      - 'POSTGRES_COLLATE_TYPE=C'
+    logging:
+      # limit logs retained on host to 25MB
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "50"
+  jira:
+    image: jira:latest
+    restart: always
+    environment:
+      TZ: Asia/Bangkok
+    volumes:
+      - '/media/HDD/jira/var/atlassian/jira'
+    ports:
+      - '18009:8080'
+    networks:
+      - jiranet
+
+networks:
+  jiranet:
+    driver: bridge
+
